@@ -1,0 +1,19 @@
+service: ipsum
+
+app: serverless-challenges
+tenant: lukelafountaine
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+
+functions:
+ ipsum:
+  handler: handler.ipsum
+  events: 
+   - http: 
+      path: ipsum
+      method: get
+      cors: true
+
+
