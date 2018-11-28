@@ -1,0 +1,8 @@
+{
+
+    "extends": "@silvermine/eslint-config/node",
+    "parserOptions": {
+         "ecmaVersion": 8
+     }
+ 
+ }
