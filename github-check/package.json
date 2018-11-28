@@ -1,0 +1,20 @@
+{
+  "name": "github-check",
+  "version": "1.0.0",
+  "description": "a github check to verify that your code meets linter requirements",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Luke LaFountaine",
+  "license": "ISC",
+  "dependencies": {
+    "@silvermine/eslint-config": "^2.0.0-preview.1",
+    "del": "^3.0.0",
+    "eslint": "^5.9.0",
+    "github-app": "^4.0.1",
+    "lambda-git": "^0.1.2",
+    "nodegit": "^0.23.0",
+    "recursive-readdir": "^2.2.2"
+  }
+}
