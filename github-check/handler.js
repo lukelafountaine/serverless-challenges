@@ -1,18 +1,20 @@
 'use strict';
 
-var del = require('del');
-var CLIEngine = require('eslint').CLIEngine;
+const del = require('del');
+const CLIEngine = require('eslint').CLIEngine;
 const createApp = require('github-app');
+const git = require('lambda-git');
 const { spawnSync } = require('child_process');
-const process = require('process');
+const config = require('./config');
 
-const privateKey = process.env.GITHUB_APP_PRIVATE_KEY;
-const app = createApp({
+let app;
+
+app = createApp({
    id: 21256,
-   cert: privateKey
-})
+   cert: config.privateKey,
+});
 
-module.exports.check = async(event, context) => {
+module.exports.check = async(event) => {
 
    let statusCode = 200;
    const body = JSON.parse(event.body);
@@ -23,8 +25,8 @@ module.exports.check = async(event, context) => {
    const tempDir = Math.random().toString(36).substring(7);
 
     // if not running on lambda, just use locally installed git
-   if (process.env.IS_LAMBDA === 'true') {
-      await require('lambda-git')();
+   if (config.isLambda === 'true') {
+      await git();
    }
 
    try {
@@ -45,9 +47,11 @@ module.exports.check = async(event, context) => {
       const report = eslint.executeOnFiles([ tempDir ]);
 
       // map eslint severity to github annotation level
-      const severityMap = {
+      let severityMap;
+
+      severityMap = {
          1: 'warning',
-         2: 'failure'
+         2: 'failure',
       };
 
       let conclusion = 'success';
@@ -73,6 +77,7 @@ module.exports.check = async(event, context) => {
 
             const problem = lintedFile.messages[j];
 
+            /* eslint-disable camelcase */
             annotations.push({
                path: path,
                message: problem.message,
@@ -80,29 +85,36 @@ module.exports.check = async(event, context) => {
                start_line: problem.line,
                end_line: problem.endLine || problem.line,
             });
+            /* eslint-enable camelcase */
          }
       }
 
       // send the check for this commit on github
       const github = await app.asInstallation(473122);
 
+      /* eslint-disable camelcase */
       await github.checks.create({
          owner: body.repository.owner.login,
          repo: body.repository.name,
-         name: 'Silvermine eslint check', 
+         name: 'eslint check',
          head_sha: body.head_sha || body.check_suite.head_sha || body.head_commit.id,
          status: 'completed',
          conclusion: conclusion,
          completed_at: new Date().toISOString(),
          output: {
-            title: conclusion, 
+            title: conclusion,
             summary: summary.join('\n'),
             annotations: annotations,
-         }
+         },
       });
+      /* eslint-enable camelcase */
+
    } catch(error) {
+
+      // eslint-disable-next-line no-console
       console.log(error);
       statusCode = 500;
+
    } finally {
       del.sync([ tempDir ]);
    }

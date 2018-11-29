@@ -7,7 +7,9 @@
 /* eslint no-unused-vars: "off" */
 module.exports.ipsum = async function(event, context) {
 
-   const html = `
+   let html;
+
+   html = `
    <html>
     <body>
      <h1>Bacon Ipsum</h1>
