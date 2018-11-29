@@ -78,7 +78,7 @@ module.exports.check = async(event, context) => {
                message: problem.message,
                annotation_level: severityMap[problem.severity],
                start_line: problem.line,
-               end_line: problem.endLine,
+               end_line: problem.endLine || problem.line,
             });
          }
       }

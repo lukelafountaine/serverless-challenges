@@ -9,7 +9,7 @@ provider:
   environment:
     GITHUB_WEBHOOK_SECRET: very_very_secret
     GITHUB_APP_PRIVATE_KEY: ${s3:github-check-private-key-secret/silvermine-es-lint-checker.2018-11-23.private-key.pem}
-    IS_LAMBDA: false
+    IS_LAMBDA: true
 
 functions:
  check:
